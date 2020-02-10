@@ -1,0 +1,54 @@
+// Luke Jamie nCr robotics combination 04 of 56 of 8C3
+
+#include <Servo.h>
+int pos=0;
+int val1;
+int val;
+int potpin1=0;
+Servo servo;
+Servo servo2;
+Servo servo3;
+
+#include <IRremote.h>      
+#define plus 0xA3C8EDDB   
+#define minus 0xF076C13B  
+
+int RECV_PIN = 2;       
+                
+bool cwRotation, ccwRotation;
+IRrecv irrecv(RECV_PIN);
+decode_results results;
+
+void setup(){
+servo.attach(7);
+servo2.attach(8);
+servo3.attach(9);
+Serial.begin(9600);
+irrecv.enableIRIn();}
+void loop(){
+for (pos = 0; pos <= 180; pos += 1) {
+servo.write(pos);              
+delay(15);}
+for (pos = 180; pos >= 0; pos -= 1) { 
+servo.write(pos);             
+delay(15);}
+val1 = analogRead(potpin1);            
+val1 = map(val1, 0, 1023, 0, 180);    
+servo2.write(val1);                  
+delay(15);  
+
+if (irrecv.decode(&results)) {
+Serial.println(results.value, HEX);
+irrecv.resume(); 
+if (results.value == plus)
+{
+cwRotation = !cwRotation;      
+ccwRotation = false;}
+if (results.value == minus)
+{ccwRotation = !ccwRotation;   
+cwRotation = false;}}
+if (cwRotation && (val != 175)){
+val++;}
+if (ccwRotation && (val != 0)){ val--;}{
+servo3.write(val);
+delay(20);}}
