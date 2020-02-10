@@ -1,0 +1,31 @@
+// Luke Jamie nCr Robotics combination 01 of 56 of 8C3
+// Programmed sweep servo 1 potentiometer and joystick servo 2 and 3
+#include <Servo.h>
+
+Servo servo1;  
+Servo servo2; 
+Servo servo3;  
+int potpin1 = 0; 
+int val1;   
+int potpin2 = 1; 
+int val2;   
+int pos = 0;    
+void setup() {
+servo1.attach(9);  
+servo2.attach(8);
+servo3.attach(7);}
+void loop() {
+for (pos = 0; pos <= 180; pos += 1) {
+servo1.write(pos);              
+delay(15);}
+for (pos = 180; pos >= 0; pos -= 1) { 
+servo1.write(pos);             
+delay(15);}
+val1 = analogRead(potpin1);            
+val1 = map(val1, 0, 1023, 0, 180);    
+servo2.write(val1);                  
+delay(15);    
+val2 = analogRead(potpin2);            
+val2 = map(val2, 0, 1023, 0, 180);    
+servo3.write(val2);                  
+delay(15);}
