@@ -1,0 +1,47 @@
+// Luke Jamie nCr robotics combination 03 of 56 of 8C3
+
+#include <Servo.h>
+#define CLK 2
+#define DT 3
+Servo servo;
+Servo servo2;
+Servo servo3;
+int counter = 0;
+int currentStateCLK;
+int lastStateCLK;
+int pos=0;
+int val1;
+int potpin=0;
+void setup() {
+pinMode(CLK,INPUT);
+pinMode(DT,INPUT);
+Serial.begin(9600);
+servo.attach(9);
+servo.write(counter);
+lastStateCLK = digitalRead(CLK);
+servo2.attach(8);
+servo3.attach(7);}
+void loop() { 
+currentStateCLK = digitalRead(CLK);
+if (currentStateCLK != lastStateCLK  && currentStateCLK == 1){
+if (digitalRead(DT) != currentStateCLK) {
+counter --;
+if (counter<0)
+counter=0;} else {
+counter ++;
+if (counter>179)counter=179;}
+servo.write(counter);
+Serial.print("Position: ");
+Serial.println(counter);}
+lastStateCLK = currentStateCLK;
+
+for (pos = 0; pos <= 180; pos += 1) {
+servo2.write(pos);              
+delay(15);}
+for (pos = 180; pos >= 0; pos -= 1) { 
+servo2.write(pos);             
+delay(15);}
+val1 = analogRead(potpin);            
+val1 = map(val1, 0, 1023, 0, 180);    
+servo3.write(val1);                  
+delay(15);}
