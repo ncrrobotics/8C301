@@ -1,0 +1,465 @@
+
+
+51)4,6,8	      Button, IR Remote, Bluetooth
+
+
+// Luke Jamie nCr robotics combination 51 of 56  of 8C3
+
+#include <Servo.h>
+Servo servo1;  
+Servo servo2; 
+Servo servo3; 
+int bttx=9;    
+int btrx=10;
+#include<SoftwareSerial.h>
+SoftwareSerial bluetooth(bttx,btrx);
+
+const int buttonPin = 7;
+const int buttonPin2 = 8;
+int buttonState = 0;
+int buttonState2 = 0;
+int position = 0;
+int pos = 0 ; 
+#include <IRremote.h>      
+#define plus 0xA3C8EDDB   
+#define minus 0xF076C13B
+int val;
+int RECV_PIN = 2;       
+                
+bool cwRotation, ccwRotation;
+IRrecv irrecv(RECV_PIN);
+decode_results results;
+void setup(){
+Serial.begin(9600);
+Serial.begin(9600);
+bluetooth.begin(9600);
+irrecv.enableIRIn();
+servo1.attach(9);
+servo2.attach(10);
+servo3.attach(11);
+pinMode(buttonPin, INPUT);
+pinMode(buttonPin2,INPUT);}
+void loop() {
+
+buttonState = digitalRead(buttonPin);
+buttonState2 = digitalRead(buttonPin2);
+if(buttonState ==HIGH && position < 180){
+servo1.write(position++);
+delay(5);}
+if(buttonState2 == HIGH && position > 3){
+servo1.write(position--);
+delay(5);
+}
+
+
+if (irrecv.decode(&results)) {
+Serial.println(results.value, HEX);
+irrecv.resume(); 
+if (results.value == plus)
+{
+cwRotation = !cwRotation;      
+ccwRotation = false;}
+if (results.value == minus)
+{ccwRotation = !ccwRotation;   
+cwRotation = false;}}
+if (cwRotation && (val != 175)){
+val++;}
+if (ccwRotation && (val != 0)){ val--;}{
+servo3.write(val);
+delay(20);}
+
+if(bluetooth.available()>0)    
+{int pos=bluetooth.read(); 
+Serial.println(pos);
+servo2.write(pos);}}
+
+52)4,7,8	Button, Serial Monitor, Bluetooth
+
+// Luke Jamie nCr robotics combination  52 of 56 of 8C3
+
+#include <Servo.h>
+#include<SoftwareSerial.h>
+int pos = 0;
+Servo servo1;  
+Servo servo2; 
+Servo servo3; 
+int bttx=9;    
+int btrx=10;
+SoftwareSerial bluetooth(bttx,btrx);
+int position = 0; 
+const int buttonPin = 7;
+const int buttonPin2 = 8;
+int buttonState = 0;
+int buttonState2 = 0;
+void setup(){
+servo1.attach(3);
+servo2.attach(4);
+servo3.attach(5);
+pinMode(buttonPin, INPUT);
+pinMode(buttonPin2,INPUT);
+Serial.begin(9600);
+while (!Serial);
+Serial.println("Type your degree 30 ,60 ,90 ,120 ,150 ,180");
+Serial.begin(9600);
+bluetooth.begin(9600);}
+
+void loop(){
+
+{if(bluetooth.available()>0)    
+{int pos=bluetooth.read(); 
+Serial.println(pos);
+servo2.write(pos);}
+buttonState = digitalRead(buttonPin);
+buttonState2 = digitalRead(buttonPin2);
+if(buttonState ==HIGH && position < 180){
+servo2.write(position++);
+delay(5);}
+if(buttonState2 == HIGH && position > 3){
+servo2.write(position--);
+delay(5);
+}
+if (Serial.available()){
+{int state = Serial.parseInt();
+if (state == 30)
+{servo3.write(30);
+Serial.println("30 degrees");}
+if (state == 60)
+{servo3.write(60);
+Serial.println("60 degrees");}
+if (state == 90)
+{servo3.write(90);
+Serial.println("90 degrees");}
+if (state == 120)
+{servo3.write(120);
+Serial.println("120 degrees");}
+if (state == 150)
+{servo3.write(150);
+Serial.println("150 degrees");}
+if (state == 180)
+{servo3.write(180);
+Serial.println("180 degrees");}}}}}
+
+53) 5,6,7 Rotary Encoder ,IR remote ,Serial monitor
+
+// Luke Jamie nCr robotics combination 53 of 56 of 8C3
+
+#include <IRremote.h>      
+#define plus 0xA3C8EDDB   
+#define minus 0xF076C13B 
+#include <Servo.h>
+#define CLK 2
+#define DT 3
+Servo servo;
+Servo servo2;
+Servo servo3;
+int RECV_PIN = 2;
+int counter = 0;
+int currentStateCLK;
+int lastStateCLK;
+int pos=0;
+bool cwRotation, ccwRotation;
+IRrecv irrecv(RECV_PIN);
+decode_results results;
+int val1;
+int val;
+int potpin1=0;
+
+
+void setup() {
+Serial.begin(9600);
+while (!Serial);
+Serial.println("Type your degree 30 ,60 ,90 ,120 ,150 ,180");
+pinMode(CLK,INPUT);
+pinMode(DT,INPUT);
+Serial.begin(9600);
+servo.attach(9);
+servo.write(counter);
+lastStateCLK = digitalRead(CLK);
+servo2.attach(8);
+servo3.attach(7);
+Serial.begin(9600);
+irrecv.enableIRIn();}
+void loop() { 
+
+currentStateCLK = digitalRead(CLK);
+if (currentStateCLK != lastStateCLK  && currentStateCLK == 1){
+if (digitalRead(DT) != currentStateCLK) {
+counter --;
+if (counter<0)
+counter=0;} else {
+counter ++;
+if (counter>179)counter=179;}
+servo2.write(counter);
+Serial.print("Position: ");
+Serial.println(counter);}
+lastStateCLK = currentStateCLK;
+
+
+if (irrecv.decode(&results)) {
+Serial.println(results.value, HEX);
+irrecv.resume(); 
+if (results.value == plus)
+{
+cwRotation = !cwRotation;      
+ccwRotation = false;}
+if (results.value == minus)
+{ccwRotation = !ccwRotation;   
+cwRotation = false;}}
+if (cwRotation && (val != 175)){
+val++;}
+if (ccwRotation && (val != 0)){ val--;}{
+servo.write(val1);
+delay(20);}
+if (Serial.available()){
+{int state = Serial.parseInt();
+if (state == 30)
+{servo3.write(30);
+Serial.println("30 degrees");}
+if (state == 60)
+{servo3.write(60);
+Serial.println("60 degrees");}
+if (state == 90)
+{servo3.write(90);
+Serial.println("90 degrees");}
+if (state == 120)
+{servo3.write(120);
+Serial.println("120 degrees");}
+if (state == 150)
+{servo3.write(150);
+Serial.println("150 degrees");}
+if (state == 180)
+{servo3.write(180);
+Serial.println("180 degrees");}}}}
+
+54) 5,6,8 Rotary Encoder, IR Remote, Bluetooth
+
+// Luke Jamie nCr robotics combination 54 of 56 of 8C3
+#include<SoftwareSerial.h>
+#include <IRremote.h>      
+#define plus 0xA3C8EDDB   
+#define minus 0xF076C13B 
+#include <Servo.h>
+int bttx=9;    
+int btrx=10;
+SoftwareSerial bluetooth(bttx,btrx);
+#define CLK 2
+#define DT 3
+Servo servo;
+Servo servo2;
+Servo servo3;
+int RECV_PIN = 2;
+int counter = 0;
+int currentStateCLK;
+int lastStateCLK;
+int pos=0;
+bool cwRotation, ccwRotation;
+IRrecv irrecv(RECV_PIN);
+decode_results results;
+int val1;
+int val;
+int potpin1=0;
+
+
+void setup() {
+Serial.begin(9600);
+bluetooth.begin(9600);
+pinMode(CLK,INPUT);
+pinMode(DT,INPUT);
+Serial.begin(9600);
+servo.attach(9);
+servo.write(counter);
+lastStateCLK = digitalRead(CLK);
+servo2.attach(8);
+servo3.attach(7);
+Serial.begin(9600);
+irrecv.enableIRIn();}
+void loop() { 
+{if(bluetooth.available()>0)    
+{int pos=bluetooth.read(); 
+Serial.println(pos);
+servo2.write(pos);
+currentStateCLK = digitalRead(CLK);
+if (currentStateCLK != lastStateCLK  && currentStateCLK == 1){
+if (digitalRead(DT) != currentStateCLK) {
+counter --;
+if (counter<0)
+counter=0;} else {
+counter ++;
+if (counter>179)counter=179;}
+servo2.write(counter);
+Serial.print("Position: ");
+Serial.println(counter);}
+lastStateCLK = currentStateCLK;
+
+
+if (irrecv.decode(&results)) {
+Serial.println(results.value, HEX);
+irrecv.resume(); 
+if (results.value == plus)
+{
+cwRotation = !cwRotation;      
+ccwRotation = false;}
+if (results.value == minus)
+{ccwRotation = !ccwRotation;   
+cwRotation = false;}}
+if (cwRotation && (val != 175)){
+val++;}
+if (ccwRotation && (val != 0)){ val--;}{
+servo.write(val1);
+delay(20);}}}}
+
+55) 5,7,8 Rotary Encoder, Serial Monitor, Bluetooth
+
+// Luke Jamie nCr robotics combination 55 of 56 of 8C3
+#include<SoftwareSerial.h>      
+#include <Servo.h>
+int bttx=9;    
+int btrx=10;
+SoftwareSerial bluetooth(bttx,btrx);
+#define CLK 2
+#define DT 3
+Servo servo;
+Servo servo2;
+Servo servo3;
+int counter = 0;
+int currentStateCLK;
+int lastStateCLK;
+int pos=0;
+bool cwRotation, ccwRotation;
+int val1;
+int val;
+
+
+void setup() {
+Serial.begin(9600);
+while (!Serial);
+Serial.println("Type your degree 30 ,60 ,90 ,120 ,150 ,180");
+Serial.begin(9600);
+bluetooth.begin(9600);
+pinMode(CLK,INPUT);
+pinMode(DT,INPUT);
+Serial.begin(9600);
+servo.attach(9);
+servo.write(counter);
+lastStateCLK = digitalRead(CLK);
+servo2.attach(8);
+servo3.attach(7);
+}
+void loop() { 
+{if(bluetooth.available()>0)    
+{int pos=bluetooth.read(); 
+Serial.println(pos);
+servo2.write(pos);
+currentStateCLK = digitalRead(CLK);
+if (currentStateCLK != lastStateCLK  && currentStateCLK == 1){
+if (digitalRead(DT) != currentStateCLK) {
+counter --;
+if (counter<0)
+counter=0;} else {
+counter ++;
+if (counter>179)counter=179;}
+servo2.write(counter);
+Serial.print("Position: ");
+Serial.println(counter);}
+lastStateCLK = currentStateCLK;
+
+if (Serial.available()){
+{int state = Serial.parseInt();
+if (state == 30)
+{servo3.write(30);
+Serial.println("30 degrees");}
+if (state == 60)
+{servo3.write(60);
+Serial.println("60 degrees");}
+if (state == 90)
+{servo3.write(90);
+Serial.println("90 degrees");}
+if (state == 120)
+{servo3.write(120);
+Serial.println("120 degrees");}
+if (state == 150)
+{servo3.write(150);
+Serial.println("150 degrees");}
+if (state == 180)
+{servo3.write(180);
+Serial.println("180 degrees");}}}}}}
+
+56) 6,7,8 IR remote, Serial Monitor ,Blue tooth
+
+// Luke Jamie nCr robotics combination 56 of 56 of 8C3
+#include<SoftwareSerial.h>
+#include <IRremote.h>      
+#define plus 0xA3C8EDDB   
+#define minus 0xF076C13B 
+#include <Servo.h>
+int bttx=9;    
+int btrx=10;
+SoftwareSerial bluetooth(bttx,btrx);
+Servo servo;
+Servo servo2;
+Servo servo3;
+int RECV_PIN = 2;
+int pos=0;
+bool cwRotation, ccwRotation;
+IRrecv irrecv(RECV_PIN);
+decode_results results;
+int val1;
+int val;
+
+void setup() {
+Serial.begin(9600);
+while (!Serial);
+Serial.println("Type your degree 30 ,60 ,90 ,120 ,150 ,180");
+Serial.begin(9600);
+bluetooth.begin(9600);
+Serial.begin(9600);
+servo.attach(9);
+servo2.attach(8);
+servo3.attach(7);
+Serial.begin(9600);
+irrecv.enableIRIn();}
+void loop() { 
+{if(bluetooth.available()>0)    
+{int pos=bluetooth.read(); 
+Serial.println(pos);
+servo2.write(pos);
+{
+
+
+
+if (irrecv.decode(&results)) {
+Serial.println(results.value, HEX);
+irrecv.resume(); 
+if (results.value == plus)
+{
+cwRotation = !cwRotation;      
+ccwRotation = false;}
+if (results.value == minus)
+{ccwRotation = !ccwRotation;   
+cwRotation = false;}}
+if (cwRotation && (val != 175)){
+val++;}
+if (ccwRotation && (val != 0)){ val--;}{
+servo.write(val1);
+delay(20);}}}}
+if (Serial.available()){
+{int state = Serial.parseInt();
+if (state == 30)
+{servo3.write(30);
+Serial.println("30 degrees");}
+if (state == 60)
+{servo3.write(60);
+Serial.println("60 degrees");}
+if (state == 90)
+{servo3.write(90);
+Serial.println("90 degrees");}
+if (state == 120)
+{servo3.write(120);
+Serial.println("120 degrees");}
+if (state == 150)
+{servo3.write(150);
+Serial.println("150 degrees");}
+if (state == 180)
+{servo3.write(180);
+Serial.println("180 degrees");}}}}
+
