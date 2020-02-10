@@ -1,0 +1,524 @@
+Now that the combinations and permutations are  stipulated and tabulated we can begin with the first combination.
+
+1) 1,2,3  Program, Joystick, Potentiometer
+
+The program used is the sweep and will run in a loop despite using the joystick and potentiometer. Note the joystick is basically another potentiometer in a different housing and has very similar coding.
+
+// Luke Jamie nCr Robotics combination 01 of 56 of 8C3
+
+#include <Servo.h>
+
+Servo servo1;  
+Servo servo2; 
+Servo servo3;  
+int potpin1 = 0; 
+int val1;   
+int potpin2 = 1; 
+int val2;   
+int pos = 0;    
+void setup() {
+servo1.attach(9);  
+servo2.attach(8);
+servo3.attach(7);}
+void loop() {
+for (pos = 0; pos <= 180; pos += 1) {
+servo1.write(pos);              
+delay(15);}
+for (pos = 180; pos >= 0; pos -= 1) { 
+servo1.write(pos);             
+delay(15);}
+val1 = analogRead(potpin1);            
+val1 = map(val1, 0, 1023, 0, 180);    
+servo2.write(val1);                  
+delay(15);    
+val2 = analogRead(potpin2);            
+val2 = map(val2, 0, 1023, 0, 180);    
+servo3.write(val2);                  
+delay(15);}
+
+2)1,2,4  Program ,Joystick, Button
+
+The program is a sweep the joystick an anologue input and the button is two buttons sweeping on press back and forward.
+
+// Luke Jamie nCr robotics combination 02 of 56  of 8C3
+
+#include <Servo.h>
+
+Servo servo1;  
+Servo servo2; 
+Servo servo3; 
+int potpin1 = 0; 
+int val1;  
+const int buttonPin = 7;
+const int buttonPin2 = 8;
+int buttonState = 0;
+int buttonState2 = 0;
+int position = 0;
+int pos = 0 ; 
+void setup() {
+servo1.attach(6);
+servo2.attach(9);
+servo3.attach(10);
+pinMode(buttonPin, INPUT);
+pinMode(buttonPin2,INPUT);}
+void loop() {
+buttonState = digitalRead(buttonPin);
+buttonState2 = digitalRead(buttonPin2);
+if(buttonState ==HIGH && position < 180){
+servo1.write(position++);
+delay(5);}
+if(buttonState2 == HIGH && position > 3){
+servo1.write(position--);
+delay(5);
+for (pos = 0; pos <= 180; pos += 1) {
+servo2.write(pos);              
+delay(15);}{
+for (pos = 180; pos >= 0; pos -= 1) { 
+servo2.write(pos);             
+delay(15);}
+val1 = analogRead(potpin1);            
+val1 = map(val1, 0, 1023, 0, 180);    
+servo3.write(val1);                  
+delay(15);  
+}}}
+
+3)1,2,5  Program, Joystick ,Rotary Encoder
+
+The program is a sweep, the joystick is a potentiometer control and the rotary encoder is a control
+
+// Luke Jamie nCr robotics combination 03 of 56 of 8C3
+
+#include <Servo.h>
+#define CLK 2
+#define DT 3
+Servo servo;
+Servo servo2;
+Servo servo3;
+int counter = 0;
+int currentStateCLK;
+int lastStateCLK;
+int pos=0;
+int val1;
+int potpin=0;
+void setup() {
+pinMode(CLK,INPUT);
+pinMode(DT,INPUT);
+Serial.begin(9600);
+servo.attach(9);
+servo.write(counter);
+lastStateCLK = digitalRead(CLK);
+servo2.attach(8);
+servo3.attach(7);}
+void loop() { 
+currentStateCLK = digitalRead(CLK);
+if (currentStateCLK != lastStateCLK  && currentStateCLK == 1){
+if (digitalRead(DT) != currentStateCLK) {
+counter --;
+if (counter<0)
+counter=0;} else {
+counter ++;
+if (counter>179)counter=179;}
+servo.write(counter);
+Serial.print("Position: ");
+Serial.println(counter);}
+lastStateCLK = currentStateCLK;
+
+for (pos = 0; pos <= 180; pos += 1) {
+servo2.write(pos);              
+delay(15);}
+for (pos = 180; pos >= 0; pos -= 1) { 
+servo2.write(pos);             
+delay(15);}
+val1 = analogRead(potpin);            
+val1 = map(val1, 0, 1023, 0, 180);    
+servo3.write(val1);                  
+delay(15);}
+
+4)1,2,6  Program, Joystick ,IR Remote
+
+The program is a servo sweep the joystick is a potentiometer control and the IR remote is one button press per ten degrees.
+
+// Luke Jamie nCr robotics combination 04 of 56 of 8C3
+
+#include <Servo.h>
+int pos=0;
+int val1;
+int val;
+int potpin1=0;
+Servo servo;
+Servo servo2;
+Servo servo3;
+
+#include <IRremote.h>      
+#define plus 0xA3C8EDDB   
+#define minus 0xF076C13B  
+
+int RECV_PIN = 2;       
+                
+bool cwRotation, ccwRotation;
+IRrecv irrecv(RECV_PIN);
+decode_results results;
+
+void setup(){
+servo.attach(7);
+servo2.attach(8);
+servo3.attach(9);
+Serial.begin(9600);
+irrecv.enableIRIn();}
+void loop(){
+for (pos = 0; pos <= 180; pos += 1) {
+servo.write(pos);              
+delay(15);}
+for (pos = 180; pos >= 0; pos -= 1) { 
+servo.write(pos);             
+delay(15);}
+val1 = analogRead(potpin1);            
+val1 = map(val1, 0, 1023, 0, 180);    
+servo2.write(val1);                  
+delay(15);  
+
+if (irrecv.decode(&results)) {
+Serial.println(results.value, HEX);
+irrecv.resume(); 
+if (results.value == plus)
+{
+cwRotation = !cwRotation;      
+ccwRotation = false;}
+if (results.value == minus)
+{ccwRotation = !ccwRotation;   
+cwRotation = false;}}
+if (cwRotation && (val != 175)){
+val++;}
+if (ccwRotation && (val != 0)){ val--;}{
+servo3.write(val);
+delay(20);}}
+
+5)1,2,7 Program, Joystick, Serial Monitor
+
+Sweep Program with joystick potentiometer control with Serial monitor Input.
+
+// Luke Jamie nCr robotics combination 05 of 56 of 8C3
+
+#include <Servo.h>
+
+Servo servo1;  
+Servo servo2; 
+Servo servo3;  
+int potpin1 = 0; 
+int val1;   
+int pos = 0;    
+void setup() {
+servo1.attach(9);  
+servo2.attach(8);
+servo3.attach(7);
+
+Serial.begin(9600);
+while (!Serial);
+Serial.println("Type your degree 30 ,60 ,90 ,120 ,150 ,180");}
+
+
+void loop(){
+
+for (pos = 0; pos <= 180; pos += 1) {
+servo1.write(pos);              
+delay(15);}
+for (pos = 180; pos >= 0; pos -= 1) { 
+servo1.write(pos);             
+delay(15);}
+
+val1 = analogRead(potpin1);            
+val1 = map(val1, 0, 1023, 0, 180);    
+servo2.write(val1);                  
+delay(15);    
+
+
+if (Serial.available()){
+{int state = Serial.parseInt();
+if (state == 30)
+{servo3.write(30);
+Serial.println("30 degrees");}
+if (state == 60)
+{servo3.write(60);
+Serial.println("60 degrees");}
+if (state == 90)
+{servo3.write(90);
+Serial.println("90 degrees");}
+if (state == 120)
+{servo3.write(120);
+Serial.println("120 degrees");}
+if (state == 150)
+{servo3.write(150);
+Serial.println("150 degrees");}
+if (state == 180)
+{servo3.write(180);
+Serial.println("180 degrees");}}}}
+
+6)1,2,8 Program, Joystick, Bluetooth
+
+Program is a sweep joystick is potentiometer and Bluetooth is an app
+
+// Luke Jamie nCr robotics combination 06 of 56 of  8C3
+#include<SoftwareSerial.h>
+#include<Servo.h>
+Servo servo1;
+Servo servo2;
+Servo servo3;
+int bttx=9;    
+int btrx=10;
+int pos=0;
+int val1  ; 
+int potpin1;
+SoftwareSerial bluetooth(bttx,btrx);
+void setup()
+
+{servo1.attach(11); 
+servo2.attach(10);
+servo3.attach(12);      
+Serial.begin(9600);
+bluetooth.begin(9600);}
+void loop()
+{if(bluetooth.available()>0)    
+{int pos=bluetooth.read(); 
+Serial.println(pos);
+servo1.write(pos);}
+
+for (pos = 0; pos <= 180; pos += 1) {
+servo2.write(pos);              
+delay(15);}
+for (pos = 180; pos >= 0; pos -= 1) { 
+servo2.write(pos);             
+delay(15);}
+val1 = analogRead(potpin1);            
+val1 = map(val1, 0, 1023, 0, 180);    
+servo3.write(val1);                  
+delay(15);}
+
+7)1,3,4 Program, Potentiometer, Button 
+
+Program is a sweep analogue pin potentiometer and button sweeps on hold
+
+//Luke Jamie nCr Robotics 07 of 56 of 8C3
+
+#include <Servo.h>
+Servo servo;
+Servo servo2;
+Servo servo3;
+int pos=0;
+int potpin=0;
+int val1;
+const int buttonPin = 6;
+const int buttonPin2 = 5;
+int buttonState = 0;
+int buttonState2 = 0;
+int position = 0;
+
+void setup() {
+servo.attach(8);
+servo2.attach(9);
+servo3.attach(7);
+pinMode(buttonPin, INPUT);
+pinMode(buttonPin2,INPUT);}
+
+
+
+void loop() {
+for (pos = 0; pos <= 180; pos += 1) {
+servo2.write(pos);              
+delay(15);}
+for (pos = 180; pos >= 0; pos -= 1) { 
+servo2.write(pos);             
+delay(15);}
+
+{val1 = analogRead(potpin);            
+val1 = map(val1, 0, 1023, 0, 180);    
+servo3.write(val1);                  
+delay(15);}
+
+buttonState = digitalRead(buttonPin);
+buttonState2 = digitalRead(buttonPin2);
+if(buttonState ==HIGH && position < 180){
+servo.write(position++);
+delay(5);}
+if(buttonState2 == HIGH && position > 3){
+servo.write(position--);
+delay(5);}
+
+}
+8)1,3,5  Program, Potentiometer, Rotary Encoder
+
+//Luke Jamie nCr Robotics 8 of 56 of 8C3
+#include <Servo.h>
+#define CLK 2
+#define DT 3
+Servo servo;
+Servo servo2;
+Servo servo3;
+int counter = 0;
+int currentStateCLK;
+int lastStateCLK;
+int pos=0;
+int val1;
+int potpin=0;
+
+void setup() {
+pinMode(CLK,INPUT);
+pinMode(DT,INPUT);
+Serial.begin(9600);
+servo.attach(9);
+servo.write(counter);
+lastStateCLK = digitalRead(CLK);
+servo2.attach(8);
+servo3.attach(7);}
+
+void loop() { 
+currentStateCLK = digitalRead(CLK);
+if (currentStateCLK != lastStateCLK  && currentStateCLK == 1){
+if (digitalRead(DT) != currentStateCLK) {
+counter --;
+if (counter<0)
+counter=0;} else {
+counter ++;
+if (counter>179)counter=179;}
+servo.write(counter);
+Serial.print("Position: ");
+Serial.println(counter);}
+lastStateCLK = currentStateCLK;
+
+for (pos = 0; pos <= 180; pos += 1) {
+servo2.write(pos);              
+delay(15);}
+for (pos = 180; pos >= 0; pos -= 1) { 
+servo2.write(pos);             
+delay(15);}
+val1 = analogRead(potpin);            
+val1 = map(val1, 0, 1023, 0, 180);    
+servo3.write(val1);                  
+delay(15);}
+
+9)1,3,6 Program, Potentiometer, IR Remote
+
+//Luke Jamie nCr Robotics 09 of 56 of 8C3
+
+#include <Servo.h>
+int pos=0;
+int val1;
+int val;
+int potpin1=0;
+Servo servo;
+Servo servo2;
+Servo servo3;
+
+#include <IRremote.h>      
+#define plus 0xA3C8EDDB   
+#define minus 0xF076C13B  
+
+int RECV_PIN = 2;       
+                
+bool cwRotation, ccwRotation;
+IRrecv irrecv(RECV_PIN);
+decode_results results;
+
+void setup(){
+servo.attach(7);
+servo2.attach(8);
+servo3.attach(9);
+Serial.begin(9600);
+irrecv.enableIRIn();}
+void loop(){
+for (pos = 0; pos <= 180; pos += 1) {
+servo.write(pos);              
+delay(15);}
+for (pos = 180; pos >= 0; pos -= 1) { 
+servo.write(pos);             
+delay(15);}
+val1 = analogRead(potpin1);            
+val1 = map(val1, 0, 1023, 0, 180);    
+servo2.write(val1);                  
+delay(15);  
+
+if (irrecv.decode(&results)) {
+Serial.println(results.value, HEX);
+irrecv.resume(); 
+if (results.value == plus)
+{
+cwRotation = !cwRotation;      
+ccwRotation = false;}
+if (results.value == minus)
+{ccwRotation = !ccwRotation;   
+cwRotation = false;}}
+if (cwRotation && (val != 175)){
+val++;}
+if (ccwRotation && (val != 0)){ val--;}{
+servo3.write(val);
+delay(20);}}
+
+
+10)1,3,7 Program, Potentiometer, Serial Monitor
+
+// Luke Jamie nCr robotics combination 10 of 56 of 8C3
+
+#include <Servo.h>
+
+Servo servo1;  
+Servo servo2; 
+Servo servo3;  
+int potpin1 = 0; 
+int val1;   
+int pos = 0;    
+void setup() {
+servo1.attach(9);  
+servo2.attach(8);
+servo3.attach(7);
+
+Serial.begin(9600);
+while (!Serial);
+Serial.println("Type your degree 30 ,60 ,90 ,120 ,150 ,180");}
+
+
+void loop(){
+
+for (pos = 0; pos <= 180; pos += 1) {
+servo1.write(pos);              
+delay(15);}
+for (pos = 180; pos >= 0; pos -= 1) { 
+servo1.write(pos);             
+delay(15);}
+
+val1 = analogRead(potpin1);            
+val1 = map(val1, 0, 1023, 0, 180);    
+servo2.write(val1);                  
+delay(15);    
+
+
+if (Serial.available()){
+{int state = Serial.parseInt();
+if (state == 30)
+{servo3.write(30);
+Serial.println("30 degrees");}
+if (state == 60)
+{servo3.write(60);
+Serial.println("60 degrees");}
+if (state == 90)
+{servo3.write(90);
+Serial.println("90 degrees");}
+if (state == 120)
+{servo3.write(120);
+Serial.println("120 degrees");}
+if (state == 150)
+{servo3.write(150);
+Serial.println("150 degrees");}
+if (state == 180)
+{servo3.write(180);
+Serial.println("180 degrees");}}}}
+
+
+
+
+
+
+
+1,3,8 Program, Potentiometer, Bluetooth
+1,4,5 Program ,Button, Rotary Encoder
+1,4,6 Program ,Button ,IR remote
+1,4,7 Program, Button ,Serial monitor
+1,4,8 Program ,Button ,Bluetooth
